@@ -1,0 +1,786 @@
+# GENERATED FILE. Do not edit by hand.
+# Source: packages/api-contract/src (Zod schemas). Regenerate with:
+#   pnpm --filter @agentic-shop/api-contract openapi:generate
+openapi: 3.1.0
+info:
+  title: "Agentic Shopping Assistant: Store API"
+  version: 0.1.0
+  description: The REST contract a store implements so the shopping agent can search products, manage
+    a cart, apply discount codes and hand off to checkout. All prices, stock and discounts are
+    computed by the store.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: http://localhost:4000
+    description: Bundled mock store
+tags:
+  - name: Products
+  - name: Carts
+security:
+  - {}
+  - bearerAuth: []
+paths:
+  /products:
+    get:
+      operationId: listProducts
+      summary: Search and filter products
+      tags:
+        - Products
+      parameters:
+        - name: query
+          in: query
+          required: false
+          description: Free-text search.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+        - name: category
+          in: query
+          required: false
+          description: Exact category slug.
+          schema:
+            type: string
+            minLength: 1
+        - name: minPrice
+          in: query
+          required: false
+          description: Minimum price in minor units.
+          schema:
+            type: integer
+            minimum: 0
+        - name: maxPrice
+          in: query
+          required: false
+          description: Maximum price in minor units.
+          schema:
+            type: integer
+            minimum: 0
+        - name: inStock
+          in: query
+          required: false
+          description: When "true", only products that can be purchased.
+          schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+        - name: sort
+          in: query
+          required: false
+          description: Result ordering.
+          schema:
+            default: relevance
+            type: string
+            enum:
+              - relevance
+              - price_asc
+              - price_desc
+              - rating_desc
+              - newest
+        - name: limit
+          in: query
+          required: false
+          description: Page size.
+          schema:
+            default: 20
+            type: integer
+            minimum: 1
+            maximum: 50
+        - name: cursor
+          in: query
+          required: false
+          description: Opaque cursor from a previous `nextCursor`.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: One page of products.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+        "400":
+          description: "`validation_error`: a query parameter is invalid."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /products/{id}:
+    get:
+      operationId: getProduct
+      summary: Get one product
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The product.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: no product has this id."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts:
+    post:
+      operationId: createCart
+      summary: Create an empty cart
+      tags:
+        - Carts
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCartRequest"
+      responses:
+        "201":
+          description: The new, empty cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "400":
+          description: "`validation_error`: the body is invalid."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts/{id}:
+    get:
+      operationId: getCart
+      summary: Get a cart
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: no cart has this id."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts/{id}/items:
+    post:
+      operationId: addCartItem
+      summary: Add a product to a cart
+      description: Adds `quantity` of a variant. When the product has more than one variant, `variantId`
+        is required.
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCartItemRequest"
+      responses:
+        "200":
+          description: The updated cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "400":
+          description: "`validation_error`: the body is invalid."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: the cart, product or variant does not exist."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "`variant_required`: the product has several variants and none was chosen.
+            `out_of_stock`: the variant cannot be purchased."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts/{id}/items/{itemId}:
+    patch:
+      operationId: updateCartItem
+      summary: Change the quantity of a cart line
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCartItemRequest"
+      responses:
+        "200":
+          description: The updated cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "400":
+          description: "`validation_error`: the body is invalid."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: the cart or line does not exist."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "`out_of_stock`: the variant can no longer be purchased."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: removeCartItem
+      summary: Remove a line from a cart
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The updated cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: the cart or line does not exist."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts/{id}/discounts:
+    post:
+      operationId: applyDiscount
+      summary: Apply a discount code
+      description: The store validates the code and returns the cart with updated totals, or a clear error.
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplyDiscountRequest"
+      responses:
+        "200":
+          description: The cart with the discount applied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        "400":
+          description: "`validation_error`: the body is invalid."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: no cart has this id."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: "`discount_invalid`, `discount_expired` or `discount_min_not_met`: the code was
+            rejected."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /carts/{id}/checkout-url:
+    get:
+      operationId: getCheckoutUrl
+      summary: Get the checkout hand-off link
+      description: The shopper pays on the store itself. The agent never handles payment.
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The checkout link.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutUrlResponse"
+        "401":
+          description: "`unauthorized`: the store requires an API key and it was missing or wrong."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "`not_found`: no cart has this id."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "`cart_empty`: the cart has no items."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "Optional. Stores may require `Authorization: Bearer <STORE_API_KEY>`."
+  schemas:
+    Money:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Amount in the currency's minor unit (for example cents). Never a float.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code, for example "USD".
+      required:
+        - amount
+        - currency
+      description: A monetary amount. Always computed by the store, never by the agent.
+    ProductVariant:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+          description: Display name of the variant, for example "Black / M".
+        sku:
+          type: string
+        options:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            type: string
+          description: 'Option name to value, for example { "color": "Black", "size": "M" }.'
+        price:
+          $ref: "#/components/schemas/Money"
+        inStock:
+          type: boolean
+      required:
+        - id
+        - title
+        - options
+        - price
+        - inStock
+      description: A purchasable version of a product.
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        brand:
+          type: string
+        category:
+          type: string
+          minLength: 1
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: Absolute image URLs, primary image first.
+        price:
+          description: Lowest price across the variants.
+          $ref: "#/components/schemas/Money"
+        compareAtPrice:
+          description: Original price when the product is on sale.
+          $ref: "#/components/schemas/Money"
+        inStock:
+          type: boolean
+          description: True when at least one variant can be purchased.
+        rating:
+          type: object
+          properties:
+            average:
+              type: number
+              minimum: 0
+              maximum: 5
+            count:
+              type: integer
+              minimum: 0
+          required:
+            - average
+            - count
+        attributes:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            type:
+              - string
+              - number
+              - boolean
+          description: Flat specification attributes, used for side-by-side comparison.
+        variants:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductVariant"
+          description: Every product has at least one variant.
+        url:
+          description: Product page on the storefront.
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+      required:
+        - id
+        - title
+        - description
+        - category
+        - images
+        - price
+        - inStock
+        - attributes
+        - variants
+      description: A product in the store catalogue.
+    ProductListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        nextCursor:
+          description: Pass as `cursor` to fetch the next page; null on the last page.
+          type:
+            - string
+            - "null"
+      required:
+        - items
+        - nextCursor
+      description: One page of products.
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: Line item id, used to update or remove the line.
+        productId:
+          type: string
+          minLength: 1
+        variantId:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        variantTitle:
+          type: string
+        image:
+          type: string
+          format: uri
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+        unitPrice:
+          $ref: "#/components/schemas/Money"
+        lineTotal:
+          description: unitPrice multiplied by quantity, computed by the store.
+          $ref: "#/components/schemas/Money"
+      required:
+        - id
+        - productId
+        - variantId
+        - title
+        - quantity
+        - unitPrice
+        - lineTotal
+      description: One line in a cart.
+    AppliedDiscount:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        amount:
+          description: Amount taken off the subtotal by this code.
+          $ref: "#/components/schemas/Money"
+      required:
+        - code
+        - amount
+      description: A discount code currently applied to the cart.
+    CartTotals:
+      type: object
+      properties:
+        subtotal:
+          description: Sum of all line totals.
+          $ref: "#/components/schemas/Money"
+        discount:
+          description: Sum of all applied discounts.
+          $ref: "#/components/schemas/Money"
+        total:
+          description: subtotal minus discount.
+          $ref: "#/components/schemas/Money"
+      required:
+        - subtotal
+        - discount
+        - total
+      description: Totals computed by the store.
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code, for example "USD".
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+        itemCount:
+          type: integer
+          minimum: 0
+          description: Sum of the quantities of all lines.
+        discounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppliedDiscount"
+        totals:
+          $ref: "#/components/schemas/CartTotals"
+        updatedAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+      required:
+        - id
+        - currency
+        - items
+        - itemCount
+        - discounts
+        - totals
+        - updatedAt
+      description: A shopping cart. Returned in full after every mutation.
+    CreateCartRequest:
+      type: object
+      properties:
+        currency:
+          description: Defaults to the store currency.
+          type: string
+          pattern: ^[A-Z]{3}$
+      description: Body of `POST /carts`. May be omitted entirely.
+    AddCartItemRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          minLength: 1
+        variantId:
+          description: Required when the product has more than one variant.
+          type: string
+          minLength: 1
+        quantity:
+          default: 1
+          type: integer
+          minimum: 1
+          maximum: 99
+      required:
+        - productId
+      description: Body of `POST /carts/{id}/items`.
+    UpdateCartItemRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: New quantity. Use DELETE to remove the line.
+      required:
+        - quantity
+      description: Body of `PATCH /carts/{id}/items/{itemId}`.
+    ApplyDiscountRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 64
+      required:
+        - code
+      description: Body of `POST /carts/{id}/discounts`.
+    CheckoutUrlResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Where the shopper completes payment on the store itself.
+        expiresAt:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+      required:
+        - url
+      description: Hand-off link. The agent never handles payment.
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - validation_error
+                - unauthorized
+                - not_found
+                - variant_required
+                - out_of_stock
+                - discount_invalid
+                - discount_expired
+                - discount_min_not_met
+                - cart_empty
+                - rate_limited
+                - internal_error
+              description: Machine-readable reason for the failure.
+            message:
+              type: string
+              description: Human-readable explanation, safe to show to a shopper.
+            details:
+              description: Optional structured context, such as issues.
+          required:
+            - code
+            - message
+      required:
+        - error
+      description: Error envelope returned with every non-2xx response.

@@ -1,0 +1,67 @@
+{
+  "name": "@agentic-shop/api-contract",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Store API contract: Zod schemas, generated OpenAPI 3.1 spec and a reusable contract test suite.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./contract-tests": {
+      "import": {
+        "types": "./dist/contract-tests/index.d.ts",
+        "default": "./dist/contract-tests/index.js"
+      },
+      "require": {
+        "types": "./dist/contract-tests/index.d.cts",
+        "default": "./dist/contract-tests/index.cjs"
+      }
+    },
+    "./openapi.yaml": "./openapi/openapi.yaml"
+  },
+  "files": [
+    "dist",
+    "openapi"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "openapi:generate": "tsx scripts/generate-openapi.ts",
+    "openapi:check": "tsx scripts/generate-openapi.ts --check",
+    "contract:test": "vitest run --config vitest.contract.config.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "peerDependencies": {
+    "vitest": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
