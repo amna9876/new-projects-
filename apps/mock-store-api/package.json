@@ -5,6 +5,12 @@
   "description": "In-memory reference implementation of the Store API contract.",
   "license": "MIT",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx watch src/server.ts",
