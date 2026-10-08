@@ -1,0 +1,44 @@
+{
+  "name": "@agentic-shop/adapters",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Store adapters: the interface the agent talks to, a REST adapter for the Store API contract, and platform stubs.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@agentic-shop/api-contract": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@agentic-shop/mock-store-api": "workspace:*",
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
