@@ -2,7 +2,7 @@
 
 An embeddable chat widget whose AI agent performs store actions (search, filter, compare, cart, discounts) through tool calls against a store-provided REST API.
 
-> **Status:** Phase 1 of 6 (foundation). The Store API contract, a reference mock store and the contract test suite are in place. The agent, chat server, widget and demo storefront follow in later phases.
+> **Status:** Phase 2 of 6 (agent core). The Store API contract, a reference mock store, store adapters and the agent's tools, prompt and guardrails are in place. The chat server, widget and demo storefront follow in later phases.
 
 ## Requirements
 
@@ -37,7 +37,9 @@ The mock store then listens on `http://localhost:4000` (try `/products?query=hea
 ```
 apps/mock-store-api      Reference implementation of the Store API contract
 packages/api-contract    Zod schemas, generated OpenAPI 3.1 spec, contract tests
-docs/                    Guides (start with docs/api-contract.md)
+packages/adapters        StoreAdapter interface, REST adapter, Shopify/WooCommerce stubs
+packages/agent-core      System prompt, tool definitions and guardrails
+docs/                    architecture.md, api-contract.md
 ```
 
 ## Licence
