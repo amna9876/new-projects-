@@ -1,0 +1,7 @@
+dist
+.turbo
+.next
+coverage
+pnpm-lock.yaml
+# Generated from the Zod schemas; formatted by the generator itself.
+packages/api-contract/openapi/openapi.yaml
