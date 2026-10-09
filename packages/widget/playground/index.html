@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Widget playground</title>
+    <style>
+      body {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px;
+        font-family: Georgia, serif;
+        line-height: 1.6;
+      }
+      /* Hostile page styles: the widget must not be affected by any of these. */
+      button {
+        background: hotpink !important;
+        font-family: 'Comic Sans MS', cursive !important;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Widget playground</h1>
+    <p>
+      Run <code>pnpm dev</code> in the repository root (mock store and chat server), then
+      <code>pnpm --filter @agentic-shop/widget dev</code>. Query parameters: <code>?lang=ar</code>,
+      <code>?position=bottom-left</code>, <code>?color=%230f766e</code>.
+    </p>
+    <button>A page button with hostile styles</button>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
