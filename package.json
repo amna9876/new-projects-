@@ -18,6 +18,7 @@
     "typecheck": "turbo run typecheck",
     "e2e": "turbo run e2e",
     "contract:test": "pnpm --filter @agentic-shop/api-contract run contract:test",
+    "eval:live": "pnpm --filter @agentic-shop/server run eval:live",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "changeset": "changeset",
