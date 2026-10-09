@@ -27,6 +27,11 @@ export default tseslint.config(
     },
   },
   {
+    // Asserting on a mock (`expect(object.method)`) never calls it unbound.
+    files: ['**/test/**'],
+    rules: { '@typescript-eslint/unbound-method': 'off' },
+  },
+  {
     files: ['**/*.{js,mjs,cjs}'],
     ...tseslint.configs.disableTypeChecked,
   },

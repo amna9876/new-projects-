@@ -42,6 +42,7 @@ export function createCartTools(context: ToolContext) {
               `"${product.title}" comes in several options. Ask the shopper which one they want; nothing was added.`,
               {
                 productId: product.id,
+                productTitle: product.title,
                 options: product.variants.map((variant) => ({
                   variantId: variant.id,
                   title: variant.title,

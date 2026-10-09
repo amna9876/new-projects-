@@ -147,6 +147,7 @@ describe('cart', () => {
     expect(error.code).toBe('needs_clarification');
     expect(error.details).toEqual({
       productId: 'aurora-anc-headphones',
+      productTitle: 'Aurora ANC Wireless Headphones',
       options: [
         {
           variantId: 'aurora-anc-headphones-black',
