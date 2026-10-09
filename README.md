@@ -2,7 +2,7 @@
 
 An embeddable chat widget whose AI agent performs store actions (search, filter, compare, cart, discounts) through tool calls against a store-provided REST API.
 
-> **Status:** Phase 3 of 6 (chat server). The Store API contract, a reference mock store, store adapters, the agent and a streaming chat server are in place. The widget and demo storefront follow in later phases.
+> **Status:** Phase 4 of 6 (widget). The Store API contract, a reference mock store, store adapters, the agent, a streaming chat server and the embeddable widget are in place. The demo storefront and end-to-end tests follow.
 
 ## Requirements
 
@@ -22,7 +22,9 @@ Copy `.env.example` to `.env` and set `AI_MODEL` and `ANTHROPIC_API_KEY`. Every 
 pnpm dev
 ```
 
-This starts the mock store on `http://localhost:4000` and the chat server on `http://localhost:3001`. To talk to the agent before the widget exists:
+This starts the mock store on `http://localhost:4000`, the chat server on `http://localhost:3001` and a widget playground on `http://localhost:5173`. Open the playground and click the chat button.
+
+To talk to the chat server directly:
 
 ```bash
 curl -s -X POST http://localhost:3001/api/sessions
@@ -36,7 +38,7 @@ curl -N -X POST http://localhost:3001/api/chat -H "content-type: application/jso
 
 | Command              | What it does                                                       |
 | -------------------- | ------------------------------------------------------------------ |
-| `pnpm dev`           | Run the mock store and the chat server in watch mode               |
+| `pnpm dev`           | Run the mock store, chat server and widget playground              |
 | `pnpm build`         | Build all packages and apps                                        |
 | `pnpm test`          | Unit, integration and contract tests (no network, no API key)      |
 | `pnpm lint`          | ESLint                                                             |
@@ -52,7 +54,8 @@ packages/api-contract    Zod schemas, generated OpenAPI 3.1 spec, contract tests
 packages/adapters        StoreAdapter interface, REST adapter, Shopify/WooCommerce stubs
 packages/agent-core      System prompt, tool definitions and guardrails
 packages/server          Streaming chat endpoint, sessions, rate limiting, CORS
-docs/                    architecture.md, api-contract.md, security.md
+packages/widget          Embeddable chat widget: script tag bundle and React component
+docs/                    architecture.md, api-contract.md, embedding.md, security.md
 ```
 
 ## Licence
