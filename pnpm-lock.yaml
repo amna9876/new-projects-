@@ -102,7 +102,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(vite@8.3.3(@types/node@20.19.43)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(vite@8.3.3(@types/node@20.19.43)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/agent-core:
     dependencies:
@@ -160,7 +160,56 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(vite@8.3.3(@types/node@20.19.43)(esbuild@0.28.2)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/server:
+    dependencies:
+      '@agentic-shop/adapters':
+        specifier: workspace:*
+        version: link:../adapters
+      '@agentic-shop/agent-core':
+        specifier: workspace:*
+        version: link:../agent-core
+      '@ai-sdk/anthropic':
+        specifier: ^3.0.128
+        version: 3.0.128(zod@4.6.5)
+      '@hono/node-server':
+        specifier: ^2.1.4
+        version: 2.1.4(hono@4.13.13)
+      ai:
+        specifier: ^6.0.302
+        version: 6.0.302(zod@4.6.5)
+      hono:
+        specifier: ^4.13.13
+        version: 4.13.13
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@agentic-shop/mock-store-api':
+        specifier: workspace:*
+        version: link:../../apps/mock-store-api
+      '@types/node':
+        specifier: ^20.19.0
+        version: 20.19.43
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.29)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.11
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(vite@8.3.3(@types/node@20.19.43)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.23.15)(yaml@2.9.1))
+
 packages:
+
+  '@ai-sdk/anthropic@3.0.128':
+    resolution: {integrity: sha512-xCEEoZrEi6hnTbZgIO8A3rqXvSUkdx9oOfKLrHQrmaGhekxb+DauyekkDExyMFRm9Qr8Azaq43wLie1FTnQc5A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
 
   '@ai-sdk/gateway@3.0.211':
     resolution: {integrity: sha512-lv/psn0oKSUUgx1G8gXpcvETunpKbD73fyfjacqk3KloxgDKFfTQLmHlfdaZjCRd6fPtu7PlKCo6DN4CFde47A==}
@@ -2203,6 +2252,12 @@ packages:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
 snapshots:
+
+  '@ai-sdk/anthropic@3.0.128(zod@4.6.5)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.18
+      '@ai-sdk/provider-utils': 4.0.57(zod@4.6.5)
+      zod: 4.6.5
 
   '@ai-sdk/gateway@3.0.211(zod@4.6.5)':
     dependencies:

@@ -1,0 +1,43 @@
+{
+  "name": "@agentic-shop/server",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Streaming chat endpoint that runs the shopping agent through the Vercel AI SDK.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "eval:live": "tsx scripts/eval-live.ts"
+  },
+  "dependencies": {
+    "@agentic-shop/adapters": "workspace:*",
+    "@agentic-shop/agent-core": "workspace:*",
+    "@ai-sdk/anthropic": "^3.0.128",
+    "@hono/node-server": "^2.1.4",
+    "ai": "^6.0.302",
+    "hono": "^4.13.13",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@agentic-shop/mock-store-api": "workspace:*",
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
