@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: the contract, mock store, adapters and agent core exist. The chat server, widget and demo storefront are planned (Phases 3 to 5) and are drawn with dashed borders below.
+> Status: the contract, mock store, adapters, agent core and chat server exist. The widget and demo storefront are planned (Phases 4 and 5) and are drawn with dashed borders below.
 
 ## Overview
 
@@ -10,7 +10,7 @@ flowchart LR
     W[widget]:::planned
   end
   subgraph Your infrastructure
-    S[server<br/>streaming chat endpoint]:::planned
+    S[server<br/>streaming chat endpoint]
     A[agent-core<br/>prompt, tools, guardrails]
     AD[adapters<br/>StoreAdapter]
   end
@@ -30,12 +30,13 @@ The model never talks to the store. It can only ask for one of nine tools to be 
 
 ## Packages
 
-| Package                 | Responsibility                                                                                                               | Depends on                       |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `packages/api-contract` | Zod schemas, generated OpenAPI 3.1, contract test suite. The single source of truth.                                         | `zod`                            |
-| `packages/adapters`     | `StoreAdapter` interface; `rest` adapter for any contract-compliant store; `mock` preset; stubs for Shopify and WooCommerce. | `api-contract`                   |
-| `packages/agent-core`   | System prompt, tool definitions, guardrails. No HTTP server, no model provider.                                              | `adapters`, `api-contract`, `ai` |
-| `apps/mock-store-api`   | In-memory reference store with seed data. Used in development and by tests, in-process.                                      | `api-contract`, `hono`           |
+| Package                 | Responsibility                                                                                                               | Depends on                             |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `packages/api-contract` | Zod schemas, generated OpenAPI 3.1, contract test suite. The single source of truth.                                         | `zod`                                  |
+| `packages/adapters`     | `StoreAdapter` interface; `rest` adapter for any contract-compliant store; `mock` preset; stubs for Shopify and WooCommerce. | `api-contract`                         |
+| `packages/agent-core`   | System prompt, tool definitions, guardrails. No HTTP server, no model provider.                                              | `adapters`, `api-contract`, `ai`       |
+| `packages/server`       | Streaming chat endpoint: sessions with server-side history, rate limiting, CORS, error handling. Chooses the model provider. | `agent-core`, `adapters`, `ai`, `hono` |
+| `apps/mock-store-api`   | In-memory reference store with seed data. Used in development and by tests, in-process.                                      | `api-contract`, `hono`                 |
 
 `agent-core` uses the Vercel AI SDK only for the `tool()` helper and the step-count stop condition. It never imports a provider package; the caller passes the model:
 
@@ -111,7 +112,7 @@ Each rule is enforced in code where that is possible, and stated in the system p
 
 `packages/agent-core/test/scenarios.test.ts` replaces the model with a script and runs the real tools against the real mock store. That proves the tool wiring and every code-level guardrail, including against a model that deliberately misbehaves (it "obeys" an injected instruction, loops forever, or sends out-of-range input).
 
-It cannot prove that a real model follows the prompt-only rules (clear intent before cart changes, tone, language). Those need evaluation against a live model, which is planned alongside the chat server.
+It cannot prove that a real model follows the prompt-only rules (clear intent before cart changes, tone, language). `pnpm eval:live` runs a set of scenarios against the real model configured in `.env` for that purpose; it uses tokens and is not part of CI.
 
 ## Writing a store adapter
 
