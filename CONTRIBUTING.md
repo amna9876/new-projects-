@@ -6,6 +6,8 @@ Thank you for considering a contribution. This guide covers how to get set up, w
 
 You need Node.js 20.19 or newer and pnpm 9 or newer.
 
+On Windows, clone into a short path such as `C:\dev\agentic-shopping-assistant`. Dependency folders nest deeply, and a long parent path pushes some files past Windows' 260-character limit, which shows up as confusing "module not found" or "import specifier is not defined" errors.
+
 ```bash
 pnpm install
 ```
