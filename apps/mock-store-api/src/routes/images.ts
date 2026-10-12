@@ -41,14 +41,20 @@ export function imageRoutes(store: MockStore): Hono {
     const lines = wrap(product.title)
       .map(
         (line, index) =>
-          `<text x="200" y="${190 + index * 34}" text-anchor="middle">${escapeXml(line)}</text>`,
+          `<text x="200" y="${206 + index * 34}" text-anchor="middle">${escapeXml(line)}</text>`,
       )
       .join('');
     const svg =
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="${escapeXml(product.title)}">` +
-      `<rect width="400" height="400" fill="hsl(${hue} 45% 92%)"/>` +
-      `<circle cx="200" cy="96" r="44" fill="hsl(${hue} 50% 62%)"/>` +
-      `<g font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="hsl(${hue} 40% 24%)">${lines}</g>` +
+      `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+      `<stop offset="0" stop-color="hsl(${hue} 70% 94%)"/><stop offset="1" stop-color="hsl(${(hue + 40) % 360} 60% 84%)"/>` +
+      `</linearGradient></defs>` +
+      `<rect width="400" height="400" fill="url(#g)"/>` +
+      `<circle cx="330" cy="70" r="110" fill="hsl(${hue} 70% 78% / 0.45)"/>` +
+      `<circle cx="60" cy="350" r="90" fill="hsl(${(hue + 40) % 360} 65% 72% / 0.4)"/>` +
+      `<circle cx="200" cy="104" r="46" fill="hsl(${hue} 55% 52%)"/>` +
+      `<text x="200" y="121" text-anchor="middle" font-family="system-ui, sans-serif" font-size="46" font-weight="700" fill="#fff">${escapeXml(product.title.charAt(0))}</text>` +
+      `<g font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="hsl(${hue} 45% 22%)">${lines}</g>` +
       `</svg>`;
 
     return c.body(svg, 200, {
