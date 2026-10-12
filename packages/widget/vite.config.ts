@@ -12,6 +12,8 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
+    // Threads start faster than forked processes, which timed out on small, busy machines.
+    pool: 'threads',
     // Process CSS so the `styles.css?inline` import holds the real stylesheet in tests.
     css: true,
     include: ['test/**/*.test.{ts,tsx}'],
