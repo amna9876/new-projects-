@@ -34,8 +34,10 @@ const EnvSchema = z.object({
 export interface ServerEnv {
   provider: ProviderName;
   model: string;
-  /** The provider API key. Never log this. */
-  apiKey: string;
+  /** The provider API key, when the provider needs one. Never log this. */
+  apiKey?: string;
+  /** Endpoint override for providers that support one (for example a local Ollama). */
+  providerBaseUrl?: string;
   storeApiBaseUrl: string;
   storeApiKey?: string;
   allowedOrigins: string[];
@@ -67,13 +69,22 @@ export function readEnv(source: Record<string, string | undefined> = process.env
   const requestedProvider =
     rawProvider === undefined || rawProvider === '' ? 'anthropic' : rawProvider;
   const providerName = PROVIDER_NAMES.find((name) => name === requestedProvider);
-  const apiKeyEnv = providerName ? PROVIDERS[providerName].apiKeyEnv : undefined;
-  const apiKey = apiKeyEnv ? source[apiKeyEnv]?.trim() : undefined;
-  if (apiKeyEnv && !apiKey) {
+  const definition = providerName ? PROVIDERS[providerName] : undefined;
+  const apiKeyEnv = definition?.apiKeyEnv;
+  const apiKey = apiKeyEnv ? blankToUndefined(source[apiKeyEnv]?.trim()) : undefined;
+  if (apiKeyEnv && typeof apiKey !== 'string') {
     problems.push(`${apiKeyEnv} is required when AI_PROVIDER is "${providerName}"`);
   }
 
-  if (!parsed.success || !apiKey) throw new EnvError(problems);
+  // Some providers (a local Ollama) take an endpoint instead of a key.
+  const baseUrlEnv = definition?.baseUrlEnv;
+  const rawBaseUrl = baseUrlEnv ? blankToUndefined(source[baseUrlEnv]?.trim()) : undefined;
+  const providerBaseUrl = typeof rawBaseUrl === 'string' ? rawBaseUrl : definition?.defaultBaseUrl;
+  if (baseUrlEnv && providerBaseUrl && !z.url().safeParse(providerBaseUrl).success) {
+    problems.push(`${baseUrlEnv} must be a URL`);
+  }
+
+  if (!parsed.success || problems.length > 0) throw new EnvError(problems);
 
   const allowedOrigins = parsed.data.ALLOWED_ORIGINS.split(',')
     .map((origin) => origin.trim().replace(/\/+$/, ''))
@@ -85,7 +96,8 @@ export function readEnv(source: Record<string, string | undefined> = process.env
   return {
     provider: parsed.data.AI_PROVIDER,
     model: parsed.data.AI_MODEL,
-    apiKey,
+    apiKey: typeof apiKey === 'string' ? apiKey : undefined,
+    providerBaseUrl,
     storeApiBaseUrl: parsed.data.STORE_API_BASE_URL,
     storeApiKey: parsed.data.STORE_API_KEY,
     allowedOrigins,

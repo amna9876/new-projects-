@@ -2,6 +2,9 @@ import type { ModelMessage } from 'ai';
 import { describe, expect, it } from 'vitest';
 import {
   createMemorySessionStore,
+  createModel,
+  PROVIDER_NAMES,
+  PROVIDERS,
   createSlidingWindowLimiter,
   EnvError,
   readEnv,
@@ -16,6 +19,7 @@ describe('readEnv', () => {
       provider: 'anthropic',
       model: 'some-model',
       apiKey: 'sk-test-value',
+      providerBaseUrl: undefined,
       storeApiBaseUrl: 'http://localhost:4000',
       storeApiKey: undefined,
       allowedOrigins: ['http://localhost:3000'],
@@ -90,6 +94,33 @@ describe('readEnv', () => {
     expect(problemsOf({ ...VALID_ENV, ALLOWED_ORIGINS: '*' })[0]).toContain('"*" is not allowed');
   });
 
+  it.each([
+    ['google', 'GOOGLE_GENERATIVE_AI_API_KEY'],
+    ['groq', 'GROQ_API_KEY'],
+  ])('requires the %s key under its own variable name', (provider, variable) => {
+    expect(
+      problemsOf({ AI_MODEL: 'm', AI_PROVIDER: provider, ANTHROPIC_API_KEY: 'unused' }),
+    ).toEqual([`${variable} is required when AI_PROVIDER is "${provider}"`]);
+    const env = readEnv({ AI_MODEL: 'm', AI_PROVIDER: provider, [variable]: ' key ' });
+    expect(env).toMatchObject({ provider, apiKey: 'key' });
+  });
+
+  it('runs a local Ollama model without any key', () => {
+    const env = readEnv({ AI_MODEL: 'some-local-model', AI_PROVIDER: 'ollama' });
+    expect(env).toMatchObject({
+      provider: 'ollama',
+      apiKey: undefined,
+      providerBaseUrl: 'http://localhost:11434/v1',
+    });
+    expect(
+      readEnv({ AI_MODEL: 'm', AI_PROVIDER: 'ollama', OLLAMA_BASE_URL: 'http://gpu-box:11434/v1' })
+        .providerBaseUrl,
+    ).toBe('http://gpu-box:11434/v1');
+    expect(problemsOf({ AI_MODEL: 'm', AI_PROVIDER: 'ollama', OLLAMA_BASE_URL: 'nope' })).toEqual([
+      'OLLAMA_BASE_URL must be a URL',
+    ]);
+  });
+
   it('never puts a value into the error message', () => {
     try {
       readEnv({ AI_PROVIDER: 'skynet', ANTHROPIC_API_KEY: 'sk-live-do-not-print', AI_MODEL: '' });
@@ -98,6 +129,17 @@ describe('readEnv', () => {
       return;
     }
     throw new Error('Expected readEnv to throw.');
+  });
+});
+
+describe('createModel', () => {
+  it.each(PROVIDER_NAMES)('builds a %s model without contacting the provider', (provider) => {
+    const model = createModel({ provider, model: 'model-under-test', apiKey: 'placeholder' });
+    expect(model).toMatchObject({ modelId: 'model-under-test', specificationVersion: 'v3' });
+  });
+
+  it('has a definition for every provider name', () => {
+    expect(Object.keys(PROVIDERS).sort()).toEqual([...PROVIDER_NAMES].sort());
   });
 });
 

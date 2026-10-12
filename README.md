@@ -8,7 +8,7 @@ An embeddable chat widget whose AI agent performs store actions (search, filter,
 
 - Node.js 20.19 or newer
 - pnpm 9 or newer
-- An API key for a supported model provider (Anthropic by default)
+- A model provider: Anthropic (default), Google Gemini or Groq with an API key, or a local model through Ollama with no key
 
 ## Quick start
 
@@ -16,7 +16,7 @@ An embeddable chat widget whose AI agent performs store actions (search, filter,
 pnpm install
 ```
 
-Copy `.env.example` to `.env` and set `AI_MODEL` and `ANTHROPIC_API_KEY`. Every other variable has a working default.
+Copy `.env.example` to `.env`, choose `AI_PROVIDER`, and set `AI_MODEL` and that provider's key. Every other variable has a working default.
 
 ```bash
 pnpm dev

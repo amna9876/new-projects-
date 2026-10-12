@@ -171,6 +171,15 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^3.0.128
         version: 3.0.128(zod@4.6.5)
+      '@ai-sdk/google':
+        specifier: ^3.0.131
+        version: 3.0.131(zod@4.6.5)
+      '@ai-sdk/groq':
+        specifier: ^3.0.72
+        version: 3.0.72(zod@4.6.5)
+      '@ai-sdk/openai-compatible':
+        specifier: ^2.0.81
+        version: 2.0.81(zod@4.6.5)
       '@hono/node-server':
         specifier: ^2.1.4
         version: 2.1.4(hono@4.13.13)
@@ -264,6 +273,24 @@ packages:
 
   '@ai-sdk/gateway@3.0.211':
     resolution: {integrity: sha512-lv/psn0oKSUUgx1G8gXpcvETunpKbD73fyfjacqk3KloxgDKFfTQLmHlfdaZjCRd6fPtu7PlKCo6DN4CFde47A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/google@3.0.131':
+    resolution: {integrity: sha512-wztgK14qFScRr+xRoDU/bc1H+Q218GbSSBeiTc5pyQoxtkUOp0EdBFF8aswS/aHIs55JCQIjmlJ65Z7Bh5biNA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/groq@3.0.72':
+    resolution: {integrity: sha512-XZjv3yIGkUNHRoIo/jb5HGOJwTcXw6th5M5SSoV7s0YN9LmC4BKt3bWPcbJQwSLSka+N+xqVGwbBBo5unewBuw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/openai-compatible@2.0.81':
+    resolution: {integrity: sha512-L14Jd0lAFKNM42l9TxlpwkNiyMlSvSvGySLc9GN4FB0qOo4/WmYOeLyn/CPhghIr0K4O6vH1y0nChxGljq2ccg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2445,6 +2472,24 @@ snapshots:
       '@ai-sdk/provider': 3.0.18
       '@ai-sdk/provider-utils': 4.0.57(zod@4.6.5)
       '@vercel/oidc': 3.2.0
+      zod: 4.6.5
+
+  '@ai-sdk/google@3.0.131(zod@4.6.5)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.18
+      '@ai-sdk/provider-utils': 4.0.57(zod@4.6.5)
+      zod: 4.6.5
+
+  '@ai-sdk/groq@3.0.72(zod@4.6.5)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.18
+      '@ai-sdk/provider-utils': 4.0.57(zod@4.6.5)
+      zod: 4.6.5
+
+  '@ai-sdk/openai-compatible@2.0.81(zod@4.6.5)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.18
+      '@ai-sdk/provider-utils': 4.0.57(zod@4.6.5)
       zod: 4.6.5
 
   '@ai-sdk/provider-utils@4.0.57(zod@4.6.5)':

@@ -30,14 +30,14 @@ The model never talks to the store. It can only ask for one of nine tools to be 
 
 ## Packages
 
-| Package                 | Responsibility                                                                                                                                                  | Depends on                             |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `packages/api-contract` | Zod schemas, generated OpenAPI 3.1, contract test suite. The single source of truth.                                                                            | `zod`                                  |
-| `packages/adapters`     | `StoreAdapter` interface; `rest` adapter for any contract-compliant store; `mock` preset; stubs for Shopify and WooCommerce.                                    | `api-contract`                         |
-| `packages/agent-core`   | System prompt, tool definitions, guardrails. No HTTP server, no model provider.                                                                                 | `adapters`, `api-contract`, `ai`       |
-| `packages/server`       | Streaming chat endpoint: sessions with server-side history, rate limiting, CORS, error handling. Chooses the model provider.                                    | `agent-core`, `adapters`, `ai`, `hono` |
-| `packages/widget`       | Chat UI in a Shadow DOM: streaming, product cards, comparison table, live cart. Ships as a script and as a React component. No runtime dependency on the agent. | `react` (peer)                         |
-| `apps/mock-store-api`   | In-memory reference store with seed data. Used in development and by tests, in-process.                                                                         | `api-contract`, `hono`                 |
+| Package                 | Responsibility                                                                                                                                                                              | Depends on                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `packages/api-contract` | Zod schemas, generated OpenAPI 3.1, contract test suite. The single source of truth.                                                                                                        | `zod`                                  |
+| `packages/adapters`     | `StoreAdapter` interface; `rest` adapter for any contract-compliant store; `mock` preset; stubs for Shopify and WooCommerce.                                                                | `api-contract`                         |
+| `packages/agent-core`   | System prompt, tool definitions, guardrails. No HTTP server, no model provider.                                                                                                             | `adapters`, `api-contract`, `ai`       |
+| `packages/server`       | Streaming chat endpoint: sessions with server-side history, rate limiting, CORS, error handling. Chooses the model provider (Anthropic, Google, Groq or a local Ollama) from `AI_PROVIDER`. | `agent-core`, `adapters`, `ai`, `hono` |
+| `packages/widget`       | Chat UI in a Shadow DOM: streaming, product cards, comparison table, live cart. Ships as a script and as a React component. No runtime dependency on the agent.                             | `react` (peer)                         |
+| `apps/mock-store-api`   | In-memory reference store with seed data. Used in development and by tests, in-process.                                                                                                     | `api-contract`, `hono`                 |
 
 `agent-core` uses the Vercel AI SDK only for the `tool()` helper and the step-count stop condition. It never imports a provider package; the caller passes the model:
 

@@ -157,7 +157,12 @@ async function main() {
   let model: LanguageModel;
   try {
     const env = readEnv();
-    model = createModel({ provider: env.provider, model: env.model, apiKey: env.apiKey });
+    model = createModel({
+      provider: env.provider,
+      model: env.model,
+      apiKey: env.apiKey,
+      baseUrl: env.providerBaseUrl,
+    });
     console.log(`Live evaluation against ${env.provider} / ${env.model}\n`);
   } catch (error) {
     if (!(error instanceof EnvError)) throw error;

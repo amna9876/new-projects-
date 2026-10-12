@@ -17,7 +17,12 @@ try {
 }
 
 const app = createServer({
-  model: createModel({ provider: env.provider, model: env.model, apiKey: env.apiKey }),
+  model: createModel({
+    provider: env.provider,
+    model: env.model,
+    apiKey: env.apiKey,
+    baseUrl: env.providerBaseUrl,
+  }),
   store: createRestAdapter({ baseUrl: env.storeApiBaseUrl, apiKey: env.storeApiKey }),
   allowedOrigins: env.allowedOrigins,
   rateLimitPerMinute: env.rateLimitPerMinute,
