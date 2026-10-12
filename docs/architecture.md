@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: everything below exists except the demo storefront (Phase 5), which will embed the widget.
+> Status: every part below exists and is covered by tests, including browser tests of the demo storefront.
 
 ## Overview
 
@@ -38,6 +38,7 @@ The model never talks to the store. It can only ask for one of nine tools to be 
 | `packages/server`       | Streaming chat endpoint: sessions with server-side history, rate limiting, CORS, error handling. Chooses the model provider (Anthropic, Google, Groq or a local Ollama) from `AI_PROVIDER`. | `agent-core`, `adapters`, `ai`, `hono` |
 | `packages/widget`       | Chat UI in a Shadow DOM: streaming, product cards, comparison table, live cart. Ships as a script and as a React component. No runtime dependency on the agent.                             | `react` (peer)                         |
 | `apps/mock-store-api`   | In-memory reference store with seed data. Used in development and by tests, in-process.                                                                                                     | `api-contract`, `hono`                 |
+| `apps/demo-store`       | Next.js storefront that embeds the widget with the one-line script tag. Hosts the Playwright end-to-end tests, which run against a scripted model.                                          | `adapters`, `next`                     |
 
 `agent-core` uses the Vercel AI SDK only for the `tool()` helper and the step-count stop condition. It never imports a provider package; the caller passes the model:
 
@@ -114,6 +115,8 @@ Each rule is enforced in code where that is possible, and stated in the system p
 `packages/agent-core/test/scenarios.test.ts` replaces the model with a script and runs the real tools against the real mock store. That proves the tool wiring and every code-level guardrail, including against a model that deliberately misbehaves (it "obeys" an injected instruction, loops forever, or sends out-of-range input).
 
 It cannot prove that a real model follows the prompt-only rules (clear intent before cart changes, tone, language). `pnpm eval:live` runs a set of scenarios against the real model configured in `.env` for that purpose; it uses tokens and is not part of CI.
+
+The same applies to the browser tests in `apps/demo-store/e2e`: they drive the real storefront, widget, chat server, agent tools and store, but the model is replaced by a few rules (`e2e/chat-server.ts`). They prove the whole stack works together, not that a model makes good decisions.
 
 ## Writing a store adapter
 
