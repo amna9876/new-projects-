@@ -1,0 +1,38 @@
+{
+  "name": "@agentic-shop/demo-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Demo storefront that embeds the shopping assistant widget.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "copy-widget": "node scripts/copy-widget.mjs",
+    "dev": "node scripts/copy-widget.mjs && next dev --port 3000",
+    "build": "node scripts/copy-widget.mjs && next build",
+    "start": "next start --port 3000",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "e2e": "playwright test",
+    "demo:scripted": "node e2e/start-stack.mjs"
+  },
+  "dependencies": {
+    "@agentic-shop/adapters": "workspace:*",
+    "@agentic-shop/api-contract": "workspace:*",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@agentic-shop/mock-store-api": "workspace:*",
+    "@agentic-shop/server": "workspace:*",
+    "@agentic-shop/widget": "workspace:*",
+    "@axe-core/playwright": "^4.13.0",
+    "@hono/node-server": "^2.1.4",
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^20.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3"
+  }
+}

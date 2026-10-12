@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -21,7 +21,7 @@
       "dependsOn": ["^build"]
     },
     "e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "cache": false
     }
   }

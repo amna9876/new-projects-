@@ -22,7 +22,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "changeset": "changeset",
-    "prepare": "husky"
+    "prepare": "husky",
+    "demo:scripted": "pnpm build && pnpm --filter @agentic-shop/demo-store run demo:scripted"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",

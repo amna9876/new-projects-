@@ -5,7 +5,17 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/.next/**', '**/coverage/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.turbo/**',
+      '**/.next/**',
+      '**/coverage/**',
+      '**/next-env.d.ts',
+      '**/public/widget.js',
+      '**/playwright-report/**',
+      '**/test-results/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
