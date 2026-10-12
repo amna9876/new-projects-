@@ -201,6 +201,35 @@ describe('conversation', () => {
   });
 });
 
+describe('starter suggestions', () => {
+  it('offers suggestions before the first message and sends the chosen one', async () => {
+    const { controller } = fakeController();
+    render(<Widget client={controller} defaultOpen />);
+
+    const group = screen.getByRole('group', { name: 'Suggestions' });
+    expect(within(group).getAllByRole('button')).toHaveLength(3);
+    await userEvent.click(within(group).getByRole('button', { name: 'Show my cart' }));
+    expect(controller.send).toHaveBeenCalledExactlyOnceWith('Show my cart');
+  });
+
+  it('hides them once the conversation has started, and when given none', () => {
+    const started = fakeController({ messages: [text('1', 'user', 'hi')] });
+    const { unmount } = render(<Widget client={started.controller} defaultOpen />);
+    expect(screen.queryByRole('group', { name: 'Suggestions' })).toBeNull();
+    unmount();
+
+    const { controller } = fakeController();
+    render(<Widget client={controller} defaultOpen suggestions={[]} />);
+    expect(screen.queryByRole('group', { name: 'Suggestions' })).toBeNull();
+  });
+
+  it('accepts custom suggestions', () => {
+    const { controller } = fakeController();
+    render(<Widget client={controller} defaultOpen suggestions={['Winter jackets']} />);
+    expect(screen.getByRole('button', { name: 'Winter jackets' })).toBeDefined();
+  });
+});
+
 describe('cart', () => {
   it('shows the item count on the cart button and the cart in a drawer', async () => {
     const { controller, setState } = fakeController();

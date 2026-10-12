@@ -21,7 +21,12 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
   return (
     <li className="asa-card">
-      <ProductImage src={product.image} className="asa-card-image" />
+      <div className="asa-card-media">
+        <ProductImage src={product.image} className="asa-card-image" />
+        {product.compareAtPrice && product.inStock ? (
+          <span className="asa-tag">{t('sale')}</span>
+        ) : null}
+      </div>
       <div className="asa-card-body">
         {product.brand ? <span className="asa-card-brand">{product.brand}</span> : null}
         <span className="asa-card-title">{product.title}</span>

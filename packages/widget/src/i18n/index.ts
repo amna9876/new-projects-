@@ -1,5 +1,11 @@
 const en = {
   title: 'Shopping assistant',
+  subtitle: 'Ask me anything about our products',
+  suggestions: 'Suggestions',
+  suggestionBestRated: 'What are your best-rated products?',
+  suggestionGift: 'Help me find a gift under $50',
+  suggestionCart: 'Show my cart',
+  sale: 'Sale',
   open: 'Open shopping assistant',
   close: 'Close',
   closeAssistant: 'Close shopping assistant',
@@ -54,6 +60,12 @@ export type StringKey = keyof Strings;
 
 const ar: Strings = {
   title: 'مساعد التسوق',
+  subtitle: 'اسألني أي شيء عن منتجاتنا',
+  suggestions: 'اقتراحات',
+  suggestionBestRated: 'ما هي أفضل منتجاتكم تقييماً؟',
+  suggestionGift: 'ساعدني في اختيار هدية بأقل من 50 دولاراً',
+  suggestionCart: 'اعرض سلتي',
+  sale: 'تخفيض',
   open: 'افتح مساعد التسوق',
   close: 'إغلاق',
   closeAssistant: 'أغلق مساعد التسوق',

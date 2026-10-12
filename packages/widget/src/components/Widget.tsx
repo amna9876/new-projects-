@@ -25,6 +25,8 @@ export interface WidgetProps {
   position?: 'bottom-right' | 'bottom-left';
   /** First message shown. Defaults to the built-in greeting for the language. */
   greeting?: string;
+  /** Starter prompts shown before the first message. Pass an empty array to hide them. */
+  suggestions?: string[];
   /** Replace individual UI strings. */
   strings?: Partial<Strings>;
   defaultOpen?: boolean;
@@ -81,10 +83,19 @@ export function Widget(props: WidgetProps) {
   const cartId = useId();
   const launcher = useRef<HTMLButtonElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
+  const root = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(open);
 
   const busy = state.status !== 'idle';
-  const send = useCallback((text: string) => void client.send(text), [client]);
+  // Buttons that send a message (cards, variants, suggestions) get disabled or removed while
+  // the answer streams, which would strand keyboard focus. Park it in the message field instead.
+  const send = useCallback(
+    (text: string) => {
+      void client.send(text);
+      input.current?.focus();
+    },
+    [client],
+  );
   const context = useMemo<WidgetContextValue>(
     () => ({ t, locale: language, send, busy }),
     [t, language, send, busy],
@@ -95,6 +106,21 @@ export function Widget(props: WidgetProps) {
     if (open) input.current?.focus();
     else if (wasOpen.current) launcher.current?.focus();
     wasOpen.current = open;
+  }, [open]);
+
+  // Escape closes the panel even when focus has fallen back to the page body
+  // (for example after clicking empty space inside the panel).
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      const rootNode = root.current?.getRootNode();
+      const host = rootNode instanceof ShadowRoot ? rootNode.host : root.current;
+      const active = document.activeElement;
+      if (active === document.body || active === null || host?.contains(active)) setOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
   function submit(event?: FormEvent) {
@@ -125,10 +151,12 @@ export function Widget(props: WidgetProps) {
   return (
     <WidgetProvider value={context}>
       <div
+        ref={root}
         className={`asa-root asa-${position}`}
         dir={directionOf(language)}
         lang={language}
         data-open={open}
+        data-busy={busy}
       >
         {open ? (
           <section
@@ -139,7 +167,10 @@ export function Widget(props: WidgetProps) {
             onKeyDown={onPanelKeyDown}
           >
             <header className="asa-header">
-              <h2 className="asa-title">{t('title')}</h2>
+              <div className="asa-heading">
+                <h2 className="asa-title">{t('title')}</h2>
+                <p className="asa-subtitle">{t('subtitle')}</p>
+              </div>
               <button
                 type="button"
                 className="asa-icon-button"
@@ -171,7 +202,17 @@ export function Widget(props: WidgetProps) {
               </div>
             ) : null}
 
-            <MessageList state={state} greeting={props.greeting ?? t('greeting')} />
+            <MessageList
+              state={state}
+              greeting={props.greeting ?? t('greeting')}
+              suggestions={
+                props.suggestions ?? [
+                  t('suggestionBestRated'),
+                  t('suggestionGift'),
+                  t('suggestionCart'),
+                ]
+              }
+            />
 
             {state.error ? (
               <div className="asa-error" role="alert">

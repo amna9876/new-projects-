@@ -30,6 +30,7 @@ describe('ProductGrid', () => {
     expect(within(card).getByText('$249.00').tagName).toBe('S');
     expect(within(card).getByLabelText('4.7 out of 5 (2184 reviews)')).toBeDefined();
     expect(within(card).getByText('3 options')).toBeDefined();
+    expect(within(card).getByText('Sale')).toBeDefined();
     expect(card.querySelector('img')?.getAttribute('src')).toBe(HEADPHONES.image);
   });
 

@@ -53,8 +53,15 @@ function Message({ message }: { message: ChatMessage }) {
   );
 }
 
-export function MessageList({ state, greeting }: { state: ChatState; greeting: string }) {
-  const { t } = useWidget();
+export interface MessageListProps {
+  state: ChatState;
+  greeting: string;
+  /** Starter prompts offered until the shopper has sent a first message. */
+  suggestions: string[];
+}
+
+export function MessageList({ state, greeting, suggestions }: MessageListProps) {
+  const { t, send, busy } = useWidget();
   const scroller = useRef<HTMLDivElement>(null);
   const last = state.messages.at(-1);
 
@@ -66,17 +73,35 @@ export function MessageList({ state, greeting }: { state: ChatState; greeting: s
 
   return (
     <div className="asa-scroll" ref={scroller}>
-      <ul className="asa-messages" role="log" aria-live="polite" aria-label={t('conversation')}>
-        <li className="asa-message asa-assistant">
-          <div className="asa-bubble">
-            <RichText text={greeting} />
-          </div>
-        </li>
-        {state.sessionRestarted ? <li className="asa-notice">{t('sessionRestarted')}</li> : null}
-        {state.messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
-      </ul>
+      {/* The live region wraps the list: a role on the <ul> itself would strip its list semantics. */}
+      <div role="log" aria-live="polite" aria-label={t('conversation')}>
+        <ul className="asa-messages">
+          <li className="asa-message asa-assistant">
+            <div className="asa-bubble">
+              <RichText text={greeting} />
+            </div>
+          </li>
+          {state.sessionRestarted ? <li className="asa-notice">{t('sessionRestarted')}</li> : null}
+          {state.messages.map((message) => (
+            <Message key={message.id} message={message} />
+          ))}
+        </ul>
+      </div>
+      {state.messages.length === 0 && suggestions.length > 0 ? (
+        <div className="asa-suggestions" role="group" aria-label={t('suggestions')}>
+          {suggestions.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              className="asa-button asa-chip"
+              disabled={busy}
+              onClick={() => send(suggestion)}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {state.status === 'sending' || (state.status === 'streaming' && last?.role === 'user') ? (
         <div className="asa-typing" role="status" aria-label={t('typing')}>
           <span />

@@ -11,7 +11,10 @@ import { mount, optionsFromDataset, type MountedWidget } from './mount';
 export { mount } from './mount';
 
 // Captured synchronously: `document.currentScript` is only set while the script first runs.
-const script = document.currentScript as HTMLScriptElement | null;
+// Some loaders (module wrappers, tag managers) leave it empty, so fall back to the tag itself.
+const script =
+  (document.currentScript as HTMLScriptElement | null) ??
+  document.querySelector<HTMLScriptElement>('script[data-api-url]');
 
 let mounted: MountedWidget | undefined;
 
