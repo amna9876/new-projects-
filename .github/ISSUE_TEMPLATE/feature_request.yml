@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest an improvement or a new capability.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation, not the solution. Who runs into it and when?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you propose?
+    validations:
+      required: true
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Does it touch any of these?
+      description: These areas need extra care; see CONTRIBUTING.md.
+      options:
+        - label: The Store API contract (every store implementation is affected)
+        - label: A new agent tool, or a change to what an existing tool may do
+        - label: A guardrail or the system prompt
+        - label: What the widget renders from store or model text
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
