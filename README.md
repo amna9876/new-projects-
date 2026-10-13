@@ -1,67 +1,117 @@
 # Agentic Shopping Assistant
 
-An embeddable chat widget whose AI agent does things in your store: it searches, filters, compares, manages the cart and applies discount codes, by calling a small REST API that your store provides.
+A chat widget for online stores whose AI assistant can **act**, not just talk: it searches, compares, fills the cart and applies discount codes, through a small API that the store provides.
 
 [![CI](https://github.com/YOUR_GITHUB_USERNAME/agentic-shopping-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/agentic-shopping-assistant/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 ![The assistant comparing two products on the demo storefront](./docs/assets/demo-store.png)
 
-<!-- DEMO GIF PLACEHOLDER: record a short walkthrough (search, compare, add to cart, discount,
-     checkout) with `pnpm demo:scripted`, save it as docs/assets/demo.gif and replace the
-     screenshot above with it. -->
+<!-- DEMO GIF PLACEHOLDER: record a walkthrough with `pnpm demo:scripted`, save it as
+     docs/assets/demo.gif and replace the screenshot above. -->
 
-## The problem
+## Contents
 
-Most "AI chat" on shopping sites can only talk. It answers questions from a knowledge base, and when the shopper says _"add the black one"_ it replies with instructions for doing it yourself.
+- [Why](#why)
+- [Features](#features)
+- [Quick start](#quick-start)
+- [How it works](#how-it-works)
+- [Embed it in your site](#embed-it-in-your-site)
+- [Connect your store](#connect-your-store)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
 
-Letting a language model act in a store is risky in a different way. It can invent a price, apply a discount nobody offered, or follow instructions hidden in a product description.
+## Why
 
-This project is a reference for doing it properly:
+Most shop chatbots can only answer questions. When a shopper says _"add the black one"_, they reply with instructions.
 
-- The agent can **act**, through nine narrowly defined tools.
-- It can **only** act through your store's own API, so prices, stock, discounts and totals are always the store's numbers.
-- The rules that matter are **enforced in code**, not just requested in a prompt.
-- A store integrates by implementing **one documented contract** and running a test suite that proves it.
+Letting an AI model act in a store has its own risks: it can invent a price, apply a discount nobody offered, or obey instructions hidden in a product description.
+
+This project shows one way to do it safely:
+
+- The assistant acts through **nine narrow tools** and nothing else.
+- Every price, stock level, discount and total comes **from the store**, never from the model.
+- The rules that matter are **enforced in code**, not only asked for in a prompt.
+- A store integrates by implementing **one documented contract**, with a test suite that proves it.
 
 ## Features
 
-**For shoppers**
+| For shoppers                                | For store owners                               | For engineers                                   |
+| ------------------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| Streaming chat with starter suggestions     | One `<script>` tag to embed                    | OpenAPI 3.1 contract generated from Zod schemas |
+| Product cards and a comparison table        | Themable with CSS variables and `data-*`       | Contract test suite any store can run           |
+| Live cart with the store's own totals       | Shadow DOM: no CSS clashes with your site      | Guardrails enforced in code                     |
+| Variant picker and checkout hand-off        | Works with any store that follows the contract | Rate limiting, strict CORS, server-side history |
+| Accessible, responsive to 360 px, LTR + RTL | Anthropic, Gemini, Groq or a local model       | 300+ tests and browser tests, no API key needed |
 
-- Streaming chat in a floating widget, with starter suggestions
-- Product cards, a side-by-side comparison table and a live cart
-- Variant picking when a product comes in several options
-- Hand-off to the store's own checkout: the assistant never touches payment
-- Keyboard accessible, screen-reader friendly, responsive down to 360 px, left-to-right and right-to-left
+## Quick start
 
-**For store owners**
+You need Node.js 20.19+ and pnpm 9+.
 
-- One `<script>` tag to embed; themable with CSS variables and `data-*` attributes
-- Shadow DOM isolation: your CSS cannot break the widget and its CSS cannot leak out
-- Works with any store that implements the [Store API contract](./docs/api-contract.md)
-- Bring your own model: Anthropic, Google Gemini, Groq, or a local model through Ollama
+```bash
+pnpm install
+```
 
-**For engineers**
+**Try it without an API key:**
 
-- OpenAPI 3.1 contract generated from Zod schemas, with a contract test suite any store can run
-- Guardrails in code: cart ownership, discount-code provenance, step cap, error containment
-- Rate limiting per IP and per session, strict CORS, server-side conversation history
-- 300+ unit and integration tests and Playwright end-to-end tests, all runnable with no API key
+```bash
+pnpm demo:scripted
+```
 
-## Architecture
+Open http://localhost:3100. The store, the chat server and the assistant's tools are real, but the replies are **scripted, not AI**, so it understands only a few phrases: "show me headphones", "compare the aurora and pulse", "add the skillet", "apply code WELCOME10", "checkout".
+
+**Run it with a real model:**
+
+1. Copy `.env.example` to `.env`.
+2. Set `AI_PROVIDER`, `AI_MODEL` and that provider's key.
+
+   | Provider       | `AI_PROVIDER` | Key variable                   |
+   | -------------- | ------------- | ------------------------------ |
+   | Anthropic      | `anthropic`   | `ANTHROPIC_API_KEY`            |
+   | Google Gemini  | `google`      | `GOOGLE_GENERATIVE_AI_API_KEY` |
+   | Groq           | `groq`        | `GROQ_API_KEY`                 |
+   | Ollama (local) | `ollama`      | none                           |
+
+3. Start everything:
+
+   ```bash
+   pnpm dev
+   ```
+
+Open http://localhost:3000. The model must support tool calling.
+
+<details>
+<summary>All commands</summary>
+
+| Command              | What it does                                                    |
+| -------------------- | --------------------------------------------------------------- |
+| `pnpm dev`           | Mock store, chat server, demo storefront and widget playground  |
+| `pnpm demo:scripted` | Build and serve the demo with scripted replies (no API key)     |
+| `pnpm build`         | Build all packages and apps                                     |
+| `pnpm test`          | Unit, integration and contract tests (no network, no API key)   |
+| `pnpm e2e`           | Playwright browser tests against the scripted demo              |
+| `pnpm lint`          | ESLint                                                          |
+| `pnpm typecheck`     | TypeScript in strict mode                                       |
+| `pnpm contract:test` | Run the contract suite against `STORE_API_BASE_URL` (any store) |
+| `pnpm eval:live`     | Agent scenarios against the real model in `.env` (uses tokens)  |
+
+</details>
+
+## How it works
 
 ```mermaid
 flowchart LR
   subgraph Browser
-    W[widget<br/>Shadow DOM]
+    W[Widget<br/>Shadow DOM]
   end
   subgraph Your infrastructure
-    S[server<br/>streaming chat endpoint]
-    A[agent-core<br/>prompt, tools, guardrails]
-    AD[adapters<br/>StoreAdapter]
+    S[Chat server<br/>streaming, sessions, limits]
+    A[Agent core<br/>prompt, tools, guardrails]
+    AD[Store adapter]
   end
   LLM[(Model provider)]
-  ST[(Your store<br/>implements the contract)]
+  ST[(Your store API)]
 
   W -- message / stream --> S
   S -- prompt + tool results --> LLM
@@ -70,72 +120,21 @@ flowchart LR
   AD -- HTTP, validated --> ST
 ```
 
-The model never talks to the store. It can only ask for one of nine tools to be run; each tool is a small function that calls a `StoreAdapter`, and the adapter is the only code that performs HTTP against the store. More in [docs/architecture.md](./docs/architecture.md).
+The model never talks to the store. It can only ask for a tool to be run; each tool calls a store adapter, and the adapter is the only code that reaches the store.
 
 | Path                    | What it is                                                            |
 | ----------------------- | --------------------------------------------------------------------- |
 | `packages/api-contract` | Zod schemas, generated OpenAPI 3.1 spec, contract test suite          |
 | `packages/adapters`     | `StoreAdapter` interface, REST adapter, Shopify and WooCommerce stubs |
-| `packages/agent-core`   | System prompt, tool definitions, guardrails (no server, no provider)  |
+| `packages/agent-core`   | System prompt, the nine tools, guardrails                             |
 | `packages/server`       | Streaming chat endpoint, sessions, rate limiting, CORS                |
 | `packages/widget`       | The embeddable widget: script bundle and React component              |
-| `apps/mock-store-api`   | In-memory reference store with 36 products                            |
-| `apps/demo-store`       | Next.js storefront that embeds the widget; hosts the end-to-end tests |
+| `apps/mock-store-api`   | In-memory reference store with 36 made-up products                    |
+| `apps/demo-store`       | Next.js demo storefront and the browser tests                         |
 
-## Quick start
+More detail: [docs/architecture.md](./docs/architecture.md).
 
-Requirements: Node.js 20.19 or newer and pnpm 9 or newer.
-
-```bash
-pnpm install
-```
-
-### Without an API key
-
-```bash
-pnpm demo:scripted
-```
-
-Open **http://localhost:3100**. This serves the full demo with **scripted replies instead of an AI model**: the agent's tools, the chat server and the store are real, but the assistant only understands a few phrases ("show me headphones", "compare the aurora and pulse", "add the skillet", "apply code WELCOME10", "checkout").
-
-### With a real model
-
-Copy `.env.example` to `.env`, choose `AI_PROVIDER`, and set `AI_MODEL` and that provider's key. Every other variable has a working default.
-
-```bash
-pnpm dev
-```
-
-Open **http://localhost:3000**. This runs the mock store (`:4000`), the chat server (`:3001`), the demo storefront (`:3000`) and a widget playground (`:5173`).
-
-| Provider       | `AI_PROVIDER` | Key variable                   |
-| -------------- | ------------- | ------------------------------ |
-| Anthropic      | `anthropic`   | `ANTHROPIC_API_KEY`            |
-| Google Gemini  | `google`      | `GOOGLE_GENERATIVE_AI_API_KEY` |
-| Groq           | `groq`        | `GROQ_API_KEY`                 |
-| Ollama (local) | `ollama`      | none                           |
-
-The model must support tool calling. To see how a given model behaves on the cases that matter (ambiguous requests, injected instructions, discount codes), run:
-
-```bash
-pnpm eval:live
-```
-
-### Scripts
-
-| Command              | What it does                                                    |
-| -------------------- | --------------------------------------------------------------- |
-| `pnpm dev`           | Mock store, chat server, demo storefront and widget playground  |
-| `pnpm demo:scripted` | Build and serve the demo with scripted replies (no API key)     |
-| `pnpm build`         | Build all packages and apps                                     |
-| `pnpm test`          | Unit, integration and contract tests (no network, no API key)   |
-| `pnpm e2e`           | Playwright end-to-end tests against the scripted demo           |
-| `pnpm lint`          | ESLint                                                          |
-| `pnpm typecheck`     | TypeScript in strict mode                                       |
-| `pnpm contract:test` | Run the contract suite against `STORE_API_BASE_URL` (any store) |
-| `pnpm eval:live`     | Agent scenarios against the real model in `.env` (uses tokens)  |
-
-## Embedding the widget
+## Embed it in your site
 
 Host `packages/widget/dist/widget.js` with your site and add one line:
 
@@ -143,87 +142,52 @@ Host `packages/widget/dist/widget.js` with your site and add one line:
 <script src="/widget.js" data-store-id="demo" data-api-url="https://your-server" async></script>
 ```
 
-Optional attributes: `data-primary-color`, `data-position`, `data-greeting`, `data-language`. A React component (`<ShoppingAssistant />`) is also exported. Theming, languages, accessibility and security properties are covered in [docs/embedding.md](./docs/embedding.md).
+Optional: `data-primary-color`, `data-position`, `data-greeting`, `data-language`. A React component is exported too.
 
-## Connecting your store
+Theming, languages and accessibility: [docs/embedding.md](./docs/embedding.md).
 
-Your store needs to answer nine requests: search products, get a product, create and read a cart, add, update and remove cart items, apply a discount code, and return a checkout link. There are two ways to provide them.
+## Connect your store
 
-**1. Implement the contract over HTTP** (any language). Follow [docs/api-contract.md](./docs/api-contract.md) or the [OpenAPI spec](./packages/api-contract/openapi/openapi.yaml), then prove it:
+Your store has to answer nine requests: search products, get a product, create and read a cart, add, update and remove items, apply a discount code, and return a checkout link.
 
-```bash
-STORE_API_BASE_URL=https://your-store.example/api pnpm contract:test
-```
+- **Any backend:** implement the [Store API contract](./docs/api-contract.md) and verify it with `pnpm contract:test`.
+- **TypeScript:** write a small store adapter that calls your platform's SDK.
 
-Point the chat server at it with `STORE_API_BASE_URL`, and you are done.
-
-**2. Write a store adapter** (TypeScript), when you would rather call a platform SDK directly:
-
-```ts
-import { StoreApiError, type StoreAdapter } from '@agentic-shop/adapters';
-
-export function createMyStoreAdapter(client: MyStoreClient): StoreAdapter {
-  return {
-    name: 'my-store',
-    async searchProducts(params) {
-      const result = await client.products.search(params);
-      return { items: result.products.map(toContractProduct), nextCursor: result.next ?? null };
-    },
-    async addCartItem(cartId, item) {
-      const product = await client.products.get(item.productId);
-      if (product.variants.length > 1 && !item.variantId) {
-        throw new StoreApiError(409, 'variant_required', 'Choose an option first.');
-      }
-      return toContractCart(await client.carts.add(cartId, item));
-    },
-    // ...the other seven operations
-  };
-}
-```
-
-Rules for an adapter:
-
-- Return contract-shaped objects. Money is `{ amount, currency }` with the amount in minor units (cents), never a float.
-- Throw `StoreApiError` for refusals a shopper should hear about (`not_found`, `out_of_stock`, `variant_required`, `discount_invalid`, ...). Throw `StoreUnavailableError` for everything else.
-- Compute every total in the store. The agent only reports what you return.
-
-`packages/adapters/src/shopify.ts` and `woocommerce.ts` are stubs that sketch the mapping for those platforms. Pass your adapter to `createServer({ store, ... })` from `@agentic-shop/server`.
+Both are explained step by step in [docs/adapters.md](./docs/adapters.md).
 
 ## Security
 
-The short version; the long one is in [docs/security.md](./docs/security.md).
+| Risk                                     | Defence                                                                 |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| The model invents a price or discount    | Tools return the store's values untouched and do no arithmetic          |
+| Product text gives the model orders      | Tool results are marked untrusted; valuable actions are checked in code |
+| Hidden text applies a discount code      | A code is accepted only if the shopper typed it themselves              |
+| The model reaches another shopper's cart | The cart id stays on the server; no tool accepts one                    |
+| Store text becomes HTML or a link        | The widget renders text only; its single link is the checkout button    |
+| A client forges the conversation         | The browser sends only the new message; history is kept on the server   |
+| Abuse and runaway cost                   | Rate limits per IP and per session, a step cap, size limits             |
+| Secrets leak                             | Keys are never logged or returned; error messages are generic           |
 
-| Risk                                          | Defence                                                                                             |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| The model invents a price or a discount       | Tools return the store's values untouched and do no arithmetic                                      |
-| Product text tells the model what to do       | Tool results are marked as untrusted data; the valuable actions are also checked in code            |
-| Injected text applies a discount code         | A code is only accepted if the shopper typed it, checked against history the server recorded        |
-| The model reaches another shopper's cart      | The cart id lives in the server-side session; no tool accepts one                                   |
-| Store text becomes HTML or a link in the page | The widget renders text only; the single link it shows is the checkout button, limited to `http(s)` |
-| A client forges conversation history          | The browser sends only the new message; history is kept on the server                               |
-| Abuse and runaway cost                        | Per-IP and per-session rate limits, a step cap per turn, message and body size limits               |
-| Secrets leak                                  | Keys are never logged or returned; errors shown to clients and the model are generic                |
+The automated tests prove the code-level rules, even against a model that deliberately misbehaves. They cannot prove that a real model follows prompt-only rules, such as not adding to the cart unless asked; `pnpm eval:live` measures that against the model you choose.
 
-What the tests do and do not prove: the scripted tests prove every code-level guardrail, even against a model that deliberately misbehaves. They cannot prove that a real model follows the prompt-only rules, such as not adding to the cart unless asked. That is what `pnpm eval:live` is for.
-
-To report a vulnerability, see [SECURITY.md](./SECURITY.md).
+Full notes: [docs/security.md](./docs/security.md). To report a vulnerability: [SECURITY.md](./SECURITY.md).
 
 ## Roadmap
 
-- [ ] Working Shopify adapter (Storefront API)
-- [ ] Working WooCommerce adapter (Store API)
-- [ ] Redis-backed session store and rate limiter for multi-instance deployments
+- [ ] Working Shopify adapter
+- [ ] Working WooCommerce adapter
+- [ ] Redis-backed sessions and rate limiting for multi-instance deployments
 - [ ] More bundled languages (Urdu, Spanish, French, Hindi)
 - [ ] Order status and returns tools
-- [ ] Optional signed-in shoppers (pass a customer token through to the store)
-- [ ] Observability: structured logs and OpenTelemetry traces per turn
+- [ ] Signed-in shoppers
+- [ ] Structured logs and traces per turn
 - [ ] A hosted live demo
 
-Smaller, well-scoped starting points are listed in [docs/good-first-issues.md](./docs/good-first-issues.md).
+New here? Start with [docs/good-first-issues.md](./docs/good-first-issues.md).
 
 ## Contributing
 
-Contributions are welcome. [CONTRIBUTING.md](./CONTRIBUTING.md) explains the setup, the checks every change must pass and the commit conventions.
+Contributions are welcome. [CONTRIBUTING.md](./CONTRIBUTING.md) covers setup, the checks every change must pass, and commit conventions.
 
 ## Licence
 
