@@ -158,6 +158,9 @@ main {
 /* --- Hero ------------------------------------------------------------------- */
 .hero {
   display: grid;
+  /* minmax(0, ...) lets the column shrink below its content's natural width, so wide
+     fonts or long words wrap instead of pushing the page sideways on small phones. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   padding: clamp(1.5rem, 4vw, 3rem);
   border-radius: calc(var(--radius) + 8px);
@@ -167,6 +170,7 @@ main {
 }
 .hero h1 {
   max-width: 18ch;
+  overflow-wrap: break-word;
   margin-block: 0.5rem 0.75rem;
   font-size: clamp(1.9rem, 5vw, 3rem);
 }

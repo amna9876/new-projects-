@@ -213,6 +213,21 @@ test.describe('accessibility', () => {
 test.describe('small screens', () => {
   test.use({ viewport: { width: 360, height: 640 } });
 
+  // Operating systems ship different fonts, and a wider one must not break the layout.
+  // (This is how the suite first failed on Linux CI while passing on Windows.)
+  test('at 360px the storefront does not scroll sideways with a wider font', async ({ page }) => {
+    for (const path of ['/', '/products/aurora-anc-headphones']) {
+      await page.goto(path);
+      await page.addStyleTag({
+        content: "*, body { font-family: 'Courier New', monospace !important; }",
+      });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(overflow, `horizontal overflow on ${path}`).toBeLessThanOrEqual(0);
+    }
+  });
+
   test('at 360px the storefront does not scroll sideways and the assistant fills the screen', async ({
     page,
   }) => {
