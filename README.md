@@ -2,7 +2,7 @@
 
 A chat widget for online stores whose AI assistant can **act**, not just talk: it searches, compares, fills the cart and applies discount codes, through a small API that the store provides.
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/agentic-shopping-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/agentic-shopping-assistant/actions/workflows/ci.yml)
+[![CI](https://github.com/amna9876/new-projects-/actions/workflows/ci.yml/badge.svg)](https://github.com/amna9876/new-projects-/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 ![The assistant comparing two products on the demo storefront](./docs/assets/demo-store.png)
